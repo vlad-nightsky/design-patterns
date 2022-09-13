@@ -1,5 +1,10 @@
 package ru.nightsky.patterns.state;
 
+import ru.nightsky.patterns.state.impl.HasQuarterState;
+import ru.nightsky.patterns.state.impl.NoQuarterState;
+import ru.nightsky.patterns.state.impl.SoldOutState;
+import ru.nightsky.patterns.state.impl.SoldState;
+
 /**
  * Автомат по продаже шариков
  */
@@ -7,111 +12,75 @@ public class GumballMachine {
     /**
      * Нет шариков
      */
-    final static int SOLD_OUT = 0;
+    State soldOutState;
     /**
      * Нет монетки
      */
-    final static int NO_QUARTER = 1;
+    State noQuarterState;
     /**
      * Есть монетка
      */
-    final static int HAS_QUARTER = 2;
+    State hasQuarterState;
     /**
      * Шарик продан
      */
-    final static int SOLD = 3;
+    State soldState;
 
     /**
      * Состояние
      */
-    int state = SOLD_OUT;
+    State state;
     /**
      * Кол-во шариков в автомате
      */
-    int count = 0;
+    int count;
 
     /**
      * Конструктор получает исходное кол-во шариков.
-     * Если оно отлично от нуля то переходи в состояние NO_QUARTER, ожидая пока кто нибудь кинет монетку.
-     * В противном случае остаёмся в состояние SOLD_OUT
+     * Если оно отлично от нуля, то переходи в состояние noQuarter, ожидая пока кто-нибудь кинет монетку.
+     * В противном случае остаёмся в состояние soldOut
      *
-     * @param count кол-во шариков в аппарате
+     * @param numberGumballs кол-во шариков в аппарате
      */
-    public GumballMachine(int count) {
-        this.count = count;
-        if (count > 0)
-            state = NO_QUARTER;
+    public GumballMachine(int numberGumballs) {
+        this.count = numberGumballs;
+
+        this.soldOutState = new SoldOutState(this);
+        this.noQuarterState = new NoQuarterState(this);
+        this.hasQuarterState = new HasQuarterState(this);
+        this.soldState = new SoldState(this);
+
+        if (numberGumballs > 0)
+            state = noQuarterState;
+        else
+            state = soldOutState;
     }
 
     /**
      * В аппарат бросают монетку
      */
     public void insertQuarter() {
-        if (state == HAS_QUARTER) {
-            System.out.println("Вы не можете вставить ещё монетку");
-        } else if (state == NO_QUARTER) {
-            state = HAS_QUARTER;
-            System.out.println("Монетка принята");
-        } else if (state == SOLD_OUT) {
-            System.out.println("Монетку вставить вы не можете. Все жвачки распроданы");
-        } else if (state == SOLD) {
-            System.out.println("Подождите. Мы уже выдаём вам жвачку");
-        }
+        state.insertQuarter();
     }
 
     /**
      * Покупатель пытается вернуть монетку
      */
     public void ejectQuarter() {
-        if (state == HAS_QUARTER) {
-            System.out.println("Монетка возвращена");
-            state = NO_QUARTER;
-        } else if (state == NO_QUARTER) {
-            System.out.println("Монетки нет в аппарате");
-        } else if (state == SOLD_OUT) {
-            System.out.println("Монетки нет в аппарате. Все жвачки проданы");
-        } else if (state == SOLD) {
-            System.out.println("Вы уже повернули ручку чтоб забрать жвачку. Монетку вернуть нельзя");
-        }
+        state.ejectQuarter();
     }
 
     /**
      * Покупатель пытается дёрнуть рычаг
+     * <p>
+     * Для метода dispense() в классе GumBallMachine метод не нужен,
+     * потому что это внутреннее действие; пользователь не может напрямую потребовать,
+     * чтобы автомат выдал шарик.
+     * Однако метод dispense() для объектов State вызывается из метода turnCrank().
      */
     public void turnCrank() {
-        if (state == HAS_QUARTER) {
-            System.out.println("Ручка повёрнута");
-            state = SOLD;
-            dispense();
-        } else if (state == NO_QUARTER) {
-            System.out.println("Нужно бросить сначала монетку");
-        } else if (state == SOLD_OUT) {
-            System.out.println("Выдача невозможна. Жвачки нет");
-        } else if (state == SOLD) {
-            System.out.println("Дёрнув за ручку дважды, вы не получите ещё жвачку");
-        }
-    }
-
-    /**
-     * вызывают для выдачи шарика
-     */
-    public void dispense() {
-        if (state == HAS_QUARTER) {
-            System.out.println("Жвачку выдать не получится");
-        } else if (state == NO_QUARTER) {
-            System.out.println("Жвачку выдать не получится");
-        } else if (state == SOLD_OUT) {
-            System.out.println("Жвачку выдать не получится");
-        } else if (state == SOLD) {
-            System.out.println("Шарик жвачка сейчас выкатится");
-            count = count - 1;
-            if (count == 0) {
-                System.out.println("Жвачка закончилась");
-                state = SOLD_OUT;
-            } else {
-                state = NO_QUARTER;
-            }
-        }
+        state.turnCrank();
+        state.dispense();
     }
 
     @Override
@@ -120,5 +89,59 @@ public class GumballMachine {
                 "Стационарный аппарат по продаже жвачек #2022\n" +
                 "В наличии: " + count + " жвачек-шариков\n" +
                 "Автомат ожидает монетку!";
+    }
+
+    /**
+     * @return состояние Есть монетка
+     */
+    public State getHasQuarterState() {
+        return this.hasQuarterState;
+    }
+
+    /**
+     * Метод позволяет устанавливать состояние
+     *
+     * @param state новое состояние
+     */
+    public void setState(State state) {
+        this.state = state;
+    }
+
+    /**
+     * @return состояния Шарик продан
+     */
+    public State getSoldState() {
+        return this.soldState;
+    }
+
+    /**
+     * Возвращает кол-во шариков-жвачек
+     *
+     * @return кол-во шариков-жвачек
+     */
+    public int getCount() {
+        return count;
+    }
+
+    /**
+     * Устанавливает новое значение для шариков жвачек
+     */
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    /**
+     * @return состояние Нет шариков
+     */
+
+    public State getSoldOutState() {
+        return this.soldOutState;
+    }
+
+    /**
+     * @return состояние Нет монетки
+     */
+    public State getNoQuarterState() {
+        return this.noQuarterState;
     }
 }

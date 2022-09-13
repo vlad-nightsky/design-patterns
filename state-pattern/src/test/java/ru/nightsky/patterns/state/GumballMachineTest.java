@@ -5,7 +5,7 @@ import org.junit.Test;
 public class GumballMachineTest {
 
     @Test
-    public void test(){
+    public void test() {
         GumballMachine gumballMachine = new GumballMachine(5);
 
         System.out.println(gumballMachine);
