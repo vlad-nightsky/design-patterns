@@ -1,9 +1,6 @@
 package ru.nightsky.patterns.state;
 
-import ru.nightsky.patterns.state.impl.HasQuarterState;
-import ru.nightsky.patterns.state.impl.NoQuarterState;
-import ru.nightsky.patterns.state.impl.SoldOutState;
-import ru.nightsky.patterns.state.impl.SoldState;
+import ru.nightsky.patterns.state.impl.*;
 
 /**
  * Автомат по продаже шариков
@@ -25,6 +22,11 @@ public class GumballMachine {
      * Шарик продан
      */
     State soldState;
+    /**
+     * Каждый 10 шарик в подарок
+     */
+    State winnerState;
+
 
     /**
      * Состояние
@@ -49,6 +51,7 @@ public class GumballMachine {
         this.noQuarterState = new NoQuarterState(this);
         this.hasQuarterState = new HasQuarterState(this);
         this.soldState = new SoldState(this);
+        this.winnerState = new WinnerState(this);
 
         if (numberGumballs > 0)
             state = noQuarterState;
@@ -143,5 +146,12 @@ public class GumballMachine {
      */
     public State getNoQuarterState() {
         return this.noQuarterState;
+    }
+
+    /**
+     * Каждый 10 шарик в подарок
+     */
+    public State getWinnerState() {
+        return winnerState;
     }
 }
