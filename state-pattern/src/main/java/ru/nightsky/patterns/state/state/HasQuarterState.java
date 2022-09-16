@@ -1,48 +1,44 @@
-package ru.nightsky.patterns.state.impl;
+package ru.nightsky.patterns.state.state;
 
-import ru.nightsky.patterns.state.GumballMachine;
-import ru.nightsky.patterns.state.State;
+import ru.nightsky.patterns.state.schema.GumballMachineContext;
+import ru.nightsky.patterns.state.schema.State;
 
 import java.util.Random;
 
 public class HasQuarterState implements State {
     /**
-     * Ссылка на объект автомата
-     */
-    GumballMachine gumballMachine;
-    /**
      * Генератор случайных чисел с вероятностью 10% выигрыша
      */
     Random randomWinner = new Random(System.currentTimeMillis());
 
-    public HasQuarterState(GumballMachine gumballMachine) {
-        this.gumballMachine = gumballMachine;
-    }
-
     @Override
-    public void insertQuarter() {
+    public void insertQuarter(GumballMachineContext gumballMachine) {
         System.out.println("Вы не можете вставить ещё монетку");
     }
 
     @Override
-    public void ejectQuarter() {
+    public void ejectQuarter(GumballMachineContext gumballMachine) {
         System.out.println("Монетка возвращена");
         gumballMachine.setState(gumballMachine.getNoQuarterState());
     }
 
     @Override
-    public void turnCrank() {
+    public void turnCrank(GumballMachineContext gumballMachine) {
         System.out.println("Ручка повёрнута");
+
         int winner = randomWinner.nextInt(10);
-        if(winner == 0 && (gumballMachine.getCount() > 1)){
+
+        if (winner == 0 && (gumballMachine.getCount() > 1)) {
             gumballMachine.setState(gumballMachine.getWinnerState());
-        }else{
+        } else {
             gumballMachine.setState(gumballMachine.getSoldState());
         }
+
+        gumballMachine.currentState().dispense(gumballMachine);
     }
 
     @Override
-    public void dispense() {
+    public void dispense(GumballMachineContext gumballMachine) {
         System.out.println("Жвачку выдать не получится");
     }
 }

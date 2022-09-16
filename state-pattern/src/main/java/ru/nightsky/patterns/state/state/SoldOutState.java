@@ -1,38 +1,30 @@
-package ru.nightsky.patterns.state.impl;
+package ru.nightsky.patterns.state.state;
 
-import ru.nightsky.patterns.state.GumballMachine;
-import ru.nightsky.patterns.state.State;
+import ru.nightsky.patterns.state.schema.GumballMachineContext;
+import ru.nightsky.patterns.state.schema.State;
 
 /**
  * Нет шариков
  */
 public class SoldOutState implements State {
-    /**
-     * Ссылка на объект автомата
-     */
-    GumballMachine gumballMachine;
-
-    public SoldOutState(GumballMachine gumballMachine) {
-        this.gumballMachine = gumballMachine;
-    }
 
     @Override
-    public void insertQuarter() {
+    public void insertQuarter(GumballMachineContext gumballMachine) {
         System.out.println("Монетку вставить вы не можете. Все жвачки распроданы");
     }
 
     @Override
-    public void ejectQuarter() {
+    public void ejectQuarter(GumballMachineContext gumballMachine) {
         System.out.println("Монетки нет в аппарате. Все жвачки проданы");
     }
 
     @Override
-    public void turnCrank() {
+    public void turnCrank(GumballMachineContext gumballMachine) {
         System.out.println("Выдача невозможна. Жвачки нет");
     }
 
     @Override
-    public void dispense() {
+    public void dispense(GumballMachineContext gumballMachine) {
         System.out.println("Жвачку выдать не получится");
     }
 }

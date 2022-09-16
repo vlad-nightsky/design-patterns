@@ -1,33 +1,12 @@
 package ru.nightsky.patterns.state;
 
-import ru.nightsky.patterns.state.impl.*;
+import ru.nightsky.patterns.state.schema.GumballMachineContext;
+import ru.nightsky.patterns.state.schema.State;
 
 /**
  * Автомат по продаже шариков
  */
-public class GumballMachine {
-    /**
-     * Нет шариков
-     */
-    State soldOutState;
-    /**
-     * Нет монетки
-     */
-    State noQuarterState;
-    /**
-     * Есть монетка
-     */
-    State hasQuarterState;
-    /**
-     * Шарик продан
-     */
-    State soldState;
-    /**
-     * Каждый 10 шарик в подарок
-     */
-    State winnerState;
-
-
+public class GumballMachine implements GumballMachineContext {
     /**
      * Состояние
      */
@@ -47,43 +26,31 @@ public class GumballMachine {
     public GumballMachine(int numberGumballs) {
         this.count = numberGumballs;
 
-        this.soldOutState = new SoldOutState(this);
-        this.noQuarterState = new NoQuarterState(this);
-        this.hasQuarterState = new HasQuarterState(this);
-        this.soldState = new SoldState(this);
-        this.winnerState = new WinnerState(this);
-
         if (numberGumballs > 0)
-            state = noQuarterState;
+            state = States.NO_QUARTER_STATE;
         else
-            state = soldOutState;
+            state = States.SOLD_OUT_STATE;
     }
 
     /**
      * В аппарат бросают монетку
      */
     public void insertQuarter() {
-        state.insertQuarter();
+        state.insertQuarter(this);
     }
 
     /**
      * Покупатель пытается вернуть монетку
      */
     public void ejectQuarter() {
-        state.ejectQuarter();
+        state.ejectQuarter(this);
     }
 
     /**
      * Покупатель пытается дёрнуть рычаг
-     * <p>
-     * Для метода dispense() в классе GumBallMachine метод не нужен,
-     * потому что это внутреннее действие; пользователь не может напрямую потребовать,
-     * чтобы автомат выдал шарик.
-     * Однако метод dispense() для объектов State вызывается из метода turnCrank().
      */
     public void turnCrank() {
-        state.turnCrank();
-        state.dispense();
+        state.turnCrank(this);
     }
 
     @Override
@@ -98,7 +65,7 @@ public class GumballMachine {
      * @return состояние Есть монетка
      */
     public State getHasQuarterState() {
-        return this.hasQuarterState;
+        return States.HAS_QUARTER_STATE;
     }
 
     /**
@@ -114,7 +81,7 @@ public class GumballMachine {
      * @return состояния Шарик продан
      */
     public State getSoldState() {
-        return this.soldState;
+        return States.SOLD_STATE;
     }
 
     /**
@@ -138,20 +105,27 @@ public class GumballMachine {
      */
 
     public State getSoldOutState() {
-        return this.soldOutState;
+        return States.SOLD_OUT_STATE;
     }
 
     /**
      * @return состояние Нет монетки
      */
     public State getNoQuarterState() {
-        return this.noQuarterState;
+        return States.NO_QUARTER_STATE;
     }
 
     /**
      * Каждый 10 шарик в подарок
      */
     public State getWinnerState() {
-        return winnerState;
+        return States.WINNER_STATE;
+    }
+
+    /**
+     * @return текущее состояние
+     */
+    public State currentState() {
+        return this.state;
     }
 }

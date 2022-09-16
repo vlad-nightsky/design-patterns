@@ -1,36 +1,28 @@
-package ru.nightsky.patterns.state.impl;
+package ru.nightsky.patterns.state.state;
 
-import ru.nightsky.patterns.state.GumballMachine;
-import ru.nightsky.patterns.state.State;
+import ru.nightsky.patterns.state.schema.GumballMachineContext;
+import ru.nightsky.patterns.state.schema.State;
 
 public class NoQuarterState implements State {
-    /**
-     * Ссылка на объект автомата
-     */
-    GumballMachine gumballMachine;
-
-    public NoQuarterState(GumballMachine gumballMachine) {
-        this.gumballMachine = gumballMachine;
-    }
 
     @Override
-    public void insertQuarter() {
+    public void insertQuarter(GumballMachineContext gumballMachine) {
         System.out.println("Монетка принята");
         gumballMachine.setState(gumballMachine.getHasQuarterState());
     }
 
     @Override
-    public void ejectQuarter() {
+    public void ejectQuarter(GumballMachineContext gumballMachine) {
         System.out.println("Монетки нет в аппарате");
     }
 
     @Override
-    public void turnCrank() {
+    public void turnCrank(GumballMachineContext gumballMachine) {
         System.out.println("Нужно бросить сначала монетку");
     }
 
     @Override
-    public void dispense() {
+    public void dispense(GumballMachineContext gumballMachine) {
         System.out.println("Жвачку выдать не получится");
     }
 }
