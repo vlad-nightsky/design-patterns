@@ -11,6 +11,7 @@
     <modules>
         <module>state-pattern</module>
         <module>proxy-pattern</module>
+        <module>complex-pattern</module>
     </modules>
 
     <properties>
